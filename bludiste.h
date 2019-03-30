@@ -41,4 +41,5 @@ void makeMaze(unsigned size_x, unsigned size_y, unsigned lenght);
 int addWallVertical(blud *maze, unsigned*);
 unsigned makeWall(blud *maze, unsigned, int);
 unsigned makeWallVertical(blud *maze, unsigned last, int);
+void color(blud *maze);
 #endif /* __BLUDISTE */

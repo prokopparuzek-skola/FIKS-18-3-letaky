@@ -153,7 +153,7 @@ void color(blud *maze) {
     for (i = 0; i < maze->size_x * maze->size_y; i++) { // spočte maximální nasycenost
         if (maze->bludiste[i] > max) {
             max = maze->bludiste[i];
-        } 
+        }
     }
     for (i = 0; i < maze->size_x * maze->size_y; i++) {
         if (maze->bludiste[i] != WALL) {
@@ -210,5 +210,6 @@ int main() {
     for (i = 0; i < C; i++) {
         solve(&mesto, route[i]);
     }
+    color(&mesto);
     return 0;
 }
