@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "bludiste.h"
 
 void solve(blud *maze, int route[4]) {
@@ -146,6 +147,30 @@ void findRoute(buffer_t *queue, blud *maze, int* route) {
     maze->bludiste[position]++;
 }
 
+void color(blud *maze) {
+    int i, max = 0;
+
+    for (i = 0; i < maze->size_x * maze->size_y; i++) { // spočte maximální nasycenost
+        if (maze->bludiste[i] > max) {
+            max = maze->bludiste[i];
+        } 
+    }
+    for (i = 0; i < maze->size_x * maze->size_y; i++) {
+        if (maze->bludiste[i] != WALL) {
+            maze->bludiste[i] = ceil(255.0 * maze->bludiste[i] / max);
+        }
+    }
+    printf("P3\n%d %d\n255\n", maze->size_x, maze->size_y);
+    for (i = 0; i < maze->size_x * maze->size_y; i++) {
+        if (maze->bludiste[i] != WALL) {
+            printf("255 0 0 ");
+        }
+        else {
+            printf("0 %d 0 ", maze->bludiste[i]);
+        }
+    }
+}
+
 int main() {
     int S, W, H, P, C;
     int X, Y;
@@ -182,7 +207,7 @@ int main() {
             scanf("%d", &route[i][j]);
         }
     }
-    for (int i = 0; i < C; i++) {
+    for (i = 0; i < C; i++) {
         solve(&mesto, route[i]);
     }
     return 0;
