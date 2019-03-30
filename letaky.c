@@ -5,8 +5,12 @@
 #include "bludiste.h"
 
 void solve(blud *maze, int route[4]) {
+    if (route[0] == route[2] && route[1] == route[3]) { // Pokud je cíl stejný jako start, přeskoč
+        maze->bludiste[route[1]*maze->size_x + route[0]]++;
+        return;
+    }
     buffer_t queue = {maze->size_x, maze->size_y, 0, -1, NULL, NULL, NULL, NULL}; // indexFu je -1, před 1. použitím se zvětší
-    int back; // návratová hodnota solveStep
+    int back = 1; // návratová hodnota solveStep
 
     queue.buff = malloc(sizeof(step) * maze->size_x * maze->size_y);
     queue.stackAc = malloc(sizeof(unsigned) * maze->size_x * maze->size_y);
@@ -24,6 +28,9 @@ void solve(blud *maze, int route[4]) {
         back = makeSteps(&queue, maze, route);
     }
     if (back == 2) {
+        free(queue.buff);
+        free(queue.stackAc);
+        free(queue.stackFu);
         return;
     }
     findRoute(&queue, maze, route);
@@ -108,10 +115,10 @@ int solveStep(buffer_t *queue, blud *maze, int index, int *route) {
         if (steps[i] < 0 || steps[i] >= queue->size_x * queue->size_y){ //Kontrola mezí pole horní a dolní
             DISCARD;
         }
-        if ((steps[i] + 1) % queue->size_x == 0 && i == 3) { // Kontrola bočních stěn přechod zdola
+        if (queue->stackAc[index] % queue->size_x == 0 && steps[i] % queue->size_x == queue->size_x - 1) { // Kontrola bočních stěn přechod zdola
             DISCARD;
         }
-        if (steps[i] % queue->size_x == 0 && i == 1) { //Kontrola bočních stěn přechod zhora
+        if (queue->stackAc[index] % queue->size_x == queue->size_x - 1 && steps[i] % queue->size_x == 0) { //Kontrola bočních stěn přechod zhora
             DISCARD;
         }
         if (maze->bludiste[steps[i]] == WALL) { // Kontrola zdí
@@ -140,7 +147,7 @@ int solveStep(buffer_t *queue, blud *maze, int index, int *route) {
 void findRoute(buffer_t *queue, blud *maze, int* route) {
     int position = route[3]*queue->size_x + route[2];
 
-    while (position) {
+    while (position != route[1]*queue->size_x + route[0]) {
         maze->bludiste[position]++;
         position = queue->buff[position].parent;
     }
@@ -162,7 +169,7 @@ void color(blud *maze) {
     }
     printf("P3\n%d %d\n255\n", maze->size_x, maze->size_y);
     for (i = 0; i < maze->size_x * maze->size_y; i++) {
-        if (maze->bludiste[i] != WALL) {
+        if (maze->bludiste[i] == WALL) {
             printf("255 0 0 ");
         }
         else {
