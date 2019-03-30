@@ -26,6 +26,8 @@ typedef struct {
     int *bludiste;
 } blud;
 
+void (*fav)(buffer_t*, int, int*);
+
 blud storeBlud(void);
 void printBlud(blud*);
 int solve(blud *maze, int route[][4]);

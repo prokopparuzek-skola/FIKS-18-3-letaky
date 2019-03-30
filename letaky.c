@@ -59,15 +59,38 @@ void makeSteps(buffer_t *queue, blud *maze) {
 }
 
 void city1(buffer_t *queue, int index, int steps[4]){
-    steps[0] = queue->stackAc[index] - queue->size_x;
-    steps[1] = queue->stackAc[index] + 1;
-    steps[2] = queue->stackAc[index] + queue->size_x;
-    steps[3] = queue->stackAc[index] - 1;
+    steps[0] = queue->stackAc[index] - queue->size_x;   // nahoru
+    steps[3] = queue->stackAc[index] + 1;               // doprava
+    steps[1] = queue->stackAc[index] + queue->size_x;   // dolu
+    steps[2] = queue->stackAc[index] - 1;               // doleva
+}
+
+void city2(buffer_t *queue, int index, int steps[4]){
+    steps[3] = queue->stackAc[index] - queue->size_x;   // nahoru
+    steps[0] = queue->stackAc[index] + 1;               // doprava
+    steps[2] = queue->stackAc[index] + queue->size_x;   // dolu
+    steps[1] = queue->stackAc[index] - 1;               // doleva
+}
+
+void city3(buffer_t *queue, int index, int steps[4]){
+    steps[1] = queue->stackAc[index] - queue->size_x;   // nahoru
+    steps[3] = queue->stackAc[index] + 1;               // doprava
+    steps[2] = queue->stackAc[index] + queue->size_x;   // dolu
+    steps[0] = queue->stackAc[index] - 1;               // doleva
+}
+
+void city4(buffer_t *queue, int index, int steps[4]){
+    steps[2] = queue->stackAc[index] - queue->size_x;   // nahoru
+    steps[1] = queue->stackAc[index] + 1;               // doprava
+    steps[0] = queue->stackAc[index] + queue->size_x;   // dolu
+    steps[3] = queue->stackAc[index] - 1;               // doleva
 }
 
 void solveStep(buffer_t *queue, blud *maze, int index) {
     int steps[4] = {0, 0, 0, 0};
     int i;
+
+    fav(queue, index, steps);
 
     for (i = 0; i < 4; i++) { // Vyhození nepotřebných dat
         if (steps[i] < 0 || steps[i] >= queue->size_x * queue->size_y){ //Kontrola mezí pole horní a dolní
@@ -144,6 +167,20 @@ int main() {
     blud mesto = {W, H, NULL};
     mesto.bludiste = calloc(sizeof(int), W*H);
     int route[C][4];
+    switch (S) {
+        case 1:
+            fav = city1;
+            break;
+        case 2:
+            fav = city2;
+            break;
+        case 3:
+            fav = city3;
+            break;
+        case 4:
+            fav = city4;
+            break;
+    }
     for (; P > 0; P--) {
         scanf("%d%d", &X, &Y);
         mesto.bludiste[X + Y*W] = WALL;
