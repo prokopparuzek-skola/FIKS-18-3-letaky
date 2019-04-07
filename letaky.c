@@ -170,7 +170,7 @@ int solveStep(buffer_t *queue, blud *maze, int index, int *route) {
         }
     }
     for (i = 0; i < 4; i++) {
-        if (steps[i] == -1) {
+        if (steps[i] == -1) { // Pokud to nejde pokračuj
             continue;
         }
         test = 1;
@@ -186,7 +186,7 @@ int solveStep(buffer_t *queue, blud *maze, int index, int *route) {
 }
 
 void findRoute(buffer_t *queue, blud *maze, int* route) {
-    int position = route[3]*queue->size_x + route[2];
+    int position = route[3]*queue->size_x + route[2]; // Konec cesty
 
     while (position != route[1]*queue->size_x + route[0]) { // projde revrzně pole kroků
         maze->bludiste[position]++;
@@ -203,17 +203,13 @@ void color(blud *maze) { // Vytvoří obrázek
             max = maze->bludiste[i];
         }
     }
-    for (i = 0; i < maze->size_x * maze->size_y; i++) { // spočte maximální nasycenost
-        if (maze->bludiste[i] != WALL) {
-            maze->bludiste[i] = ceil(255.0 * maze->bludiste[i] / max);
-        }
-    }
     printf("P3\n%d %d\n255\n", maze->size_x, maze->size_y);
     for (i = 0; i < maze->size_x * maze->size_y; i++) {
         if (maze->bludiste[i] == WALL) { // Pokud překážka, zabarvi červeně
             printf("255 0 0 ");
         }
         else {
+            maze->bludiste[i] = ceil(255.0 * maze->bludiste[i] / max);
             printf("0 %d 0 ", maze->bludiste[i]); // Jinak spočtený odstín zelené
         }
     }
