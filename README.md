@@ -13,10 +13,8 @@ kroky v pořadí oblíbenosti. Například u první skupiny měst začnu krokem 
 
 ### Složitost
 Hledání v grafu má složitost `N`, jelikož každé místo navštívím pouze jednou. Pak následuje reverzní hledání cesty se 
-složitostí opět `N`. Pokud to shrnu dohromady je celková složitost `2N^2^`. `2N` na jeden graf * `N` cest. Pro vypsání 
-obrázku je složitost `O(N^2^)` jednou projdu celé město, abych zjistil nejvyšší počet cest na jednom místě, podruhé, 
+složitostí opět `N`. Pokud to shrnu dohromady je celková složitost `2N`^2^. `2N` na jeden graf * `N` cest. Pro vypsání 
+obrázku je složitost `O(N`^2^`)` jednou projdu celé město, abych zjistil nejvyšší počet cest na jednom místě, podruhé, 
 abych vypsal obrázek.
-Po vynecháni zbytečností je složitost.
-```
-O(N^2^)
-```
+Po vynecháni zbytečností je složitost.\
+`O(N`^2^`)`
