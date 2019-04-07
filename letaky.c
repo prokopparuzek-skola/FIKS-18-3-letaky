@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 
-#define WALL -1
+#define WALL -1 // Označení zdi na mapě
 
 #define DISCARD steps[i] = -1; continue
 
@@ -13,14 +13,14 @@ typedef struct {
 } step;
 
 typedef struct {
-    int size_x;
-    int size_y;
-    int indexAc;
+    int size_x; // šířka
+    int size_y; // výška
+    int indexAc; // indexy k pomocným polím
     int indexFu;
     step *buff;
-    unsigned *stackAc;
+    unsigned *stackAc; // pomocná pole, uchovávají vrcholy grafy na zpracování
     unsigned *stackFu;
-    int *route;
+    int *route; // Uchovává kroky, obsahuje rodiče daného vrcholu, odkud se na něj přišlo
 } buffer_t;
 
 typedef struct {
@@ -29,7 +29,7 @@ typedef struct {
     int *bludiste;
 } blud;
 
-void (*fav)(buffer_t*, int, int*);
+void (*fav)(buffer_t*, int, int*); // funkce, provádí kroky dle oblíbenosti v jednotlivých městech
 
 blud storeBlud(void);
 void printBlud(blud*);
@@ -45,7 +45,7 @@ unsigned makeWall(blud *maze, unsigned, int);
 unsigned makeWallVertical(blud *maze, unsigned last, int);
 void color(blud *maze);
 
-void solve(blud *maze, int route[4]) {
+void solve(blud *maze, int route[4]) { // Najde nejkratší cestu
     if (route[0] == route[2] && route[1] == route[3]) { // Pokud je cíl stejný jako start, přeskoč
         maze->bludiste[route[1]*maze->size_x + route[0]]++;
         return;
@@ -53,7 +53,7 @@ void solve(blud *maze, int route[4]) {
     buffer_t queue = {maze->size_x, maze->size_y, 0, -1, NULL, NULL, NULL, NULL}; // indexFu je -1, před 1. použitím se zvětší
     int back = 1; // návratová hodnota solveStep
 
-    queue.buff = malloc(sizeof(step) * maze->size_x * maze->size_y);
+    queue.buff = malloc(sizeof(step) * maze->size_x * maze->size_y); // Inicializuje pomocná pole
     queue.stackAc = malloc(sizeof(unsigned) * maze->size_x * maze->size_y);
     queue.stackFu = malloc(sizeof(unsigned) * maze->size_x * maze->size_y);
     queue.route = route;
@@ -62,19 +62,19 @@ void solve(blud *maze, int route[4]) {
         puts("Málo paměti");
         exit(1);
     }
-    initBuff(&queue, route);
+    initBuff(&queue, route); // inicializuje seznam kroků
     queue.stackAc[0] = route[1]*queue.size_x + route[0];
 
-    while (back == 1) {
+    while (back == 1) { // dokud jsou nějáké volné kroky, pokračuj v hledání
         back = makeSteps(&queue, maze, route);
     }
-    if (back == 2) {
+    if (back == 2) { // už není kam jít
         free(queue.buff);
         free(queue.stackAc);
         free(queue.stackFu);
         return;
     }
-    findRoute(&queue, maze, route);
+    findRoute(&queue, maze, route); // došel si do cíle, zvyš hodnotu v bludišti tam kudy si šel
 
     free(queue.buff);
     free(queue.stackAc);
@@ -150,7 +150,7 @@ int solveStep(buffer_t *queue, blud *maze, int index, int *route) {
     int steps[4] = {0, 0, 0, 0};
     int i, test = 0;
 
-    fav(queue, index, steps);
+    fav(queue, index, steps); // projde kroky dle oblíbenosti
 
     for (i = 0; i < 4; i++) { // Vyhození nepotřebných dat
         if (steps[i] < 0 || steps[i] >= queue->size_x * queue->size_y){ //Kontrola mezí pole horní a dolní
@@ -188,33 +188,33 @@ int solveStep(buffer_t *queue, blud *maze, int index, int *route) {
 void findRoute(buffer_t *queue, blud *maze, int* route) {
     int position = route[3]*queue->size_x + route[2];
 
-    while (position != route[1]*queue->size_x + route[0]) {
+    while (position != route[1]*queue->size_x + route[0]) { // projde revrzně pole kroků
         maze->bludiste[position]++;
         position = queue->buff[position].parent;
     }
     maze->bludiste[position]++;
 }
 
-void color(blud *maze) {
+void color(blud *maze) { // Vytvoří obrázek
     int i, max = 0;
 
-    for (i = 0; i < maze->size_x * maze->size_y; i++) { // spočte maximální nasycenost
+    for (i = 0; i < maze->size_x * maze->size_y; i++) {
         if (maze->bludiste[i] > max) {
             max = maze->bludiste[i];
         }
     }
-    for (i = 0; i < maze->size_x * maze->size_y; i++) {
+    for (i = 0; i < maze->size_x * maze->size_y; i++) { // spočte maximální nasycenost
         if (maze->bludiste[i] != WALL) {
             maze->bludiste[i] = ceil(255.0 * maze->bludiste[i] / max);
         }
     }
     printf("P3\n%d %d\n255\n", maze->size_x, maze->size_y);
     for (i = 0; i < maze->size_x * maze->size_y; i++) {
-        if (maze->bludiste[i] == WALL) {
+        if (maze->bludiste[i] == WALL) { // Pokud překážka, zabarvi červeně
             printf("255 0 0 ");
         }
         else {
-            printf("0 %d 0 ", maze->bludiste[i]);
+            printf("0 %d 0 ", maze->bludiste[i]); // Jinak spočtený odstín zelené
         }
     }
 }
@@ -224,15 +224,15 @@ int main() {
     int X, Y;
     int i, j;
 
-    scanf("%d%d%d%d%d", &S, &W, &H, &P, &C);
-    blud mesto = {W, H, NULL};
+    scanf("%d%d%d%d%d", &S, &W, &H, &P, &C); // Načte zadání
+    blud mesto = {W, H, NULL}; // Struktura s plánem města
     mesto.bludiste = calloc(sizeof(int), W*H);
     if (mesto.bludiste == NULL) {
         puts("Málo paměti");
         exit(1);
     }
-    int route[C][4];
-    switch (S) {
+    int route[C][4]; // inicializuje seznam cest, {Start_x, Start_y, Cíl_x, Cíl_y}
+    switch (S) { // Uloží o jakou skupinu měst jde
         case 1:
             fav = city1;
             break;
@@ -246,18 +246,18 @@ int main() {
             fav = city4;
             break;
     }
-    for (; P > 0; P--) {
+    for (; P > 0; P--) { // Načte překážky a uloží je do plánu
         scanf("%d%d", &X, &Y);
         mesto.bludiste[X + Y*W] = WALL;
     }
-    for (i = 0; i < C; i++) {
+    for (i = 0; i < C; i++) { // Načte cesty
         for (j = 0; j < 4; j++) {
             scanf("%d", &route[i][j]);
         }
     }
     for (i = 0; i < C; i++) {
-        solve(&mesto, route[i]);
+        solve(&mesto, route[i]); // Najde nejkratší cestu a zapíše jí do mapy
     }
-    color(&mesto);
+    color(&mesto); // Vytvoří obrázek
     return 0;
 }
